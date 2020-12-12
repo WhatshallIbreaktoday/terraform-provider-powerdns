@@ -419,6 +419,31 @@ func TestAccPDNSRecord_ALIAS(t *testing.T) {
 	})
 }
 
+func TestAccPDNSRecord_LUA(t *testing.T) {
+	resourceName := "powerdns_record.test-lua"
+	resourceID := `{"zone":"sysa.xyz.","id":"lua.sysa.xyz.:::LUA"}`
+
+	resource.ParallelTest(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckPDNSRecordDestroy,
+		Steps: []resource.TestStep{
+			{
+				Config: testPDNSRecordConfigLUA,
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckPDNSRecordExists(resourceName),
+				),
+			},
+			{
+				ResourceName:      resourceName,
+				ImportStateId:     resourceID,
+				ImportState:       true,
+				ImportStateVerify: true,
+			},
+		},
+	})
+}
+
 func TestAccPDNSRecord_SOA(t *testing.T) {
 	resourceName := "powerdns_record.test-soa"
 	resourceID := `{"zone":"test-soa-sysa.xyz.","id":"test-soa-sysa.xyz.:::SOA"}`
@@ -644,6 +669,15 @@ resource "powerdns_record" "test-alias" {
 	type = "ALIAS"
 	ttl = 3600
 	records = [ "www.some-alias.com." ]
+}`
+
+const testPDNSRecordConfigLUA = `
+resource "powerdns_record" "test-lua" {
+	zone = "sysa.xyz."
+	name = "lua.sysa.xyz."
+	type = "LUA"
+	ttl = 3600
+	records = [ "A \"pickclosest({''192.0.2.1'',''192.0.2.2''})\" " ]
 }`
 
 const testPDNSRecordConfigSOA = `

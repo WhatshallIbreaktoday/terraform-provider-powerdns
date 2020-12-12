@@ -23,6 +23,7 @@ services:
     - "--webserver-address=0.0.0.0"
     - "--webserver-allow-from=0.0.0.0/0"
     - "--loglevel=10"
+    - "--enable-lua-records=yes"
     environment:
       MYSQL_USER: root
       MYSQL_PASS: secret
